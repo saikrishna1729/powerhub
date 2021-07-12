@@ -1,5 +1,5 @@
-# Domain Controller check : functions that are helpful for checking DC health in an Active Directory environment
-﻿function Check-DCServices {
+﻿
+function Check-DCServices {
 
 param(
 [String] $Computer
@@ -25,4 +25,16 @@ $FailedServices.Add($_,$flag.Status)
 
  if ($FailedServices.Count -eq 0) { return $true }
  else {return $FailedServices }
+ }
+
+
+ function Check-DCConnectivity {
+
+ param(
+ [String]$DC
+ )
+
+ Invoke-Command -ComputerName $DC -ScriptBlock {Get-ADDomain | Select -ExpandProperty ReplicaDirectoryServers | Foreach-object {if ((Test-Connection $_ -Count 1 -Quiet) -ne $true) {Write-Host -ForegroundColor Red "$env:COMPUTERNAME --> $_ Failure"}}}
+
+ 
  }
